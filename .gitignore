@@ -5,6 +5,9 @@
 # Intelij-IDEA
 /.idea
 
+# vim
+/.vimlocal
+
 # Node.js
 /node_modules
 report.*.json
