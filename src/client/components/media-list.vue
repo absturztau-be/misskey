@@ -6,6 +6,7 @@
 			<template v-for="media in mediaList">
 				<XVideo :video="media" :key="media.id" v-if="media.type.startsWith('video')"/>
 				<XImage :image="media" :key="media.id" v-else-if="media.type.startsWith('image')" :raw="raw"/>
+        <XModPlayer :module="media" :key="media.id" v-else-if="media.name.endsWith('.mod') || media.name.endsWith('.xm')"/>
 			</template>
 		</div>
 	</div>
@@ -17,6 +18,7 @@ import { defineComponent } from 'vue';
 import XBanner from './media-banner.vue';
 import XImage from './media-image.vue';
 import XVideo from './media-video.vue';
+import XModPlayer from './mod-player.vue';
 import * as os from '@client/os';
 
 export default defineComponent({
@@ -24,6 +26,7 @@ export default defineComponent({
 		XBanner,
 		XImage,
 		XVideo,
+    XModPlayer,
 	},
 	props: {
 		mediaList: {
@@ -51,7 +54,7 @@ export default defineComponent({
 	},
 	methods: {
 		previewable(file) {
-			return file.type.startsWith('video') || file.type.startsWith('image');
+			return file.type.startsWith('video') || file.type.startsWith('image') || file.name.endsWith(".mod") || file.name.endsWith(".xm");
 		},
 		size() {
 			// for Safari bug
