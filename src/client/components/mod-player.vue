@@ -10,13 +10,18 @@
 		<canvas class="pattern-canvas" ref="display"></canvas>
 	</div>
 	<div class="controls">
-		<button class="play" title="play" accesskey="P" @click="play()">
-			<i class="fas fa-play"></i>
+		<button class="play" title="play" accesskey="P" @click="playPause()">
+			<i class="fas fa-play" v-if="!playing"></i>
+			<i class="fas fa-pause" v-if="playing"></i>
 		</button>
 		<button class="stop" title="stop" accesskey="X" @click="stop()">
 			<i class="fas fa-stop"></i>
 		</button>
 		<progress min="0" max="100" value="0" ref="progress"></progress>
+		<input type="range" min="0" max="1" v-model="player.context.gain.value" step="0.1" ref="volume" title="volume"/>
+		<a class="download" title="download" :href="module.url">
+			<i class="fas fa-download"></i>
+		</a>
 	</div>
 	<i class="fas fa-eye-slash" @click="hide = true"></i>
 </div>
@@ -37,6 +42,7 @@ export default defineComponent({
 	data() {
 		return {
 			hide: true,
+			playing: false
 		};
 	},
 	created() {
@@ -46,6 +52,9 @@ export default defineComponent({
 		this.buffer = null;
 		this.player.load(this.module.url).then((result) => {
 			this.buffer = result;
+			this.player.play(this.buffer);
+			this.display();
+			this.player.stop();
 		}).catch((error) => {
 			console.error(error);
 		});
@@ -88,16 +97,27 @@ export default defineComponent({
 				}
 			}
 		},
-    play() {
+    playPause() {
 			this.player.addHandler('onRowChange', () => {
 				this.$refs.progress.max = this.player.duration();
 				this.$refs.progress.value = this.player.position() % this.player.duration();
 				this.display(this.player);
 			});
-			this.player.play(this.buffer);
+			if (this.player.currentPlayingNode === null) {
+				this.player.play(this.buffer);
+				this.playing = true;
+			} else {
+				this.player.togglePause();
+				this.playing = !this.player.currentPlayingNode.paused;
+			}
     },
     stop() {
 			this.player.stop();
+			this.playing = false;
+			this.player.play(this.buffer);
+			this.display();
+			this.player.stop();
+			this.$refs.progress.value = 0;
 			this.player.handlers = [];
     }
   },
@@ -147,13 +167,100 @@ export default defineComponent({
 			padding: 4px 8px;
 		}
 
-		> button {
+		> button, a {
 			border: none;
 			background-color: transparent;
-			color: var(--accentLighten);
+			color: var(--accent);
 			
 			&:hover {
 				background-color: var(--fg);
+			}
+		}
+
+		> input[type=range] {
+			height: 21px;
+			-webkit-appearance: none;
+			width: 90px;
+			padding: 0;
+			margin: 4px 8px;
+
+			&:focus {
+				outline: none;
+				
+				&::-webkit-slider-runnable-track {
+					background: var(--bg);
+				}
+
+				&::-ms-fill-lower, &::-ms-fill-upper {
+					background: var(--bg);
+				}
+			}
+
+			&::-webkit-slider-runnable-track {
+				width: 100%;
+				height: 100%;
+				cursor: pointer;
+				border-radius: 0;
+				animate: 0.2s;
+				background: var(--bg);
+				border: 1px solid var(--fg);
+			}
+
+			&::-webkit-slider-thumb {
+				border: none;
+				height: 100%;
+				width: 14px;
+				border-radius: 0;
+				background: var(--accent);
+				cursor: pointer;
+				-webkit-appearance: none;
+				margin-top: -0.5px;
+			}
+
+			&::-moz-range-track {
+				width: 100%;
+				height: 100%;
+				cursor: pointer;
+				border-radius: 0;
+				animate: 0.2s;
+				background: var(--bg);
+				border: 1px solid var(--fg);
+			}
+
+			&::-moz-range-thumb {
+				border: none;
+				height: 100%;
+				border-radius: 0;
+				width: 14px;
+				background: var(--accent);
+				cursoer: pointer;
+			}
+
+			&::-ms-track {
+				width: 100%;
+				height: 100%;
+				cursor: pointer;
+				border-radius: 0;
+				animate: 0.2s;
+				background: transparent;
+				border-color: transparent;
+				color: transparent;
+			}
+
+			&::-ms-fill-lower, &::-ms-fill-upper {
+				background: var(--bg);
+				border: 1px solid var(--fg);
+				border-radius: 0;
+			}
+
+			&::-ms-thumb {
+				margin-top: 1px;
+				border: none;
+				height: 100%;
+				width: 14px;
+				border-radius: 0;
+				background: var(--accent);
+				cursor: pointer;
 			}
 		}
 
@@ -161,9 +268,10 @@ export default defineComponent({
 			padding: unset;
 			margin: 4px 8px;
 			flex-grow: 1;
+			background-color: var(--bg);
 
 			&::-moz-progress-bar, &::-webkit-progress-value {
-				background-color: var(--accentLighten);
+				background-color: var(--accent);
 			}
 		}
 	}

@@ -11,10 +11,12 @@ ChiptuneJsConfig.prototype.constructor = ChiptuneJsConfig;
 
 export function ChiptuneJsPlayer (config: object) {
 	this.config = config;
-	this.context = config.context || new ChiptuneAudioContext();
+	this.audioContext = config.context || new ChiptuneAudioContext();
+	this.context = this.audioContext.createGain();
 	this.currentPlayingNode = null;
 	this.handlers = [];
 	this.touchLocked = true;
+	this.volume = 1;
 }
 
 ChiptuneJsPlayer.prototype.constructor = ChiptuneJsPlayer;
@@ -70,11 +72,12 @@ ChiptuneJsPlayer.prototype.metadata = function () {
 };
 
 ChiptuneJsPlayer.prototype.unlock = function () {
-	const context = this.context;
+	const context = this.audioContext;
 	const buffer = context.createBuffer(1, 1, 22050);
 	const unlockSource = context.createBufferSource();
 	unlockSource.buffer = buffer;
-	unlockSource.connect(context.destination);
+	unlockSource.connect(this.context);
+	this.context.connect(context.destination);
 	unlockSource.start(0);
 	this.touchLocked = false;
 };
@@ -113,7 +116,8 @@ ChiptuneJsPlayer.prototype.play = function (buffer: ArrayBuffer) {
 	}
 	libopenmpt._openmpt_module_set_repeat_count(processNode.modulePtr, this.config.repeatCount || 1);
 	this.currentPlayingNode = processNode;
-	processNode.connect(this.context.destination);
+	processNode.connect(this.context);
+	this.context.connect(this.audioContext.destination);
 };
 
 ChiptuneJsPlayer.prototype.stop = function () {
@@ -160,7 +164,7 @@ ChiptuneJsPlayer.prototype.getPatternRowChannel = function (pattern: number, row
 
 ChiptuneJsPlayer.prototype.createLibopenmptNode = function (buffer, config: object) {
 	const maxFramesPerChunk = 4096;
-	const processNode = this.context.createScriptProcessor(2048, 0, 2);
+	const processNode = this.audioContext.createScriptProcessor(2048, 0, 2);
 	processNode.config = config;
 	processNode.player = this;
 	const byteArray = new Int8Array(buffer);
