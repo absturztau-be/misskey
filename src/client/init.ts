@@ -199,6 +199,16 @@ if (splash) splash.addEventListener('transitionend', () => {
 
 const rootEl = document.createElement('div');
 document.body.appendChild(rootEl);
+
+window.libopenmpt = {
+	memoryInitializerPrefixUrl: '/static-assets/'
+};
+
+const chiplib = document.createElement('script');
+chiplib.type = 'text/javascript';
+chiplib.src = '/static-assets/libopenmpt.js';
+document.body.appendChild(chiplib);
+
 app.mount(rootEl);
 
 reactionPicker.init();
