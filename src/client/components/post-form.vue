@@ -246,8 +246,12 @@ export default defineComponent({
 			this.text += ' ';
 		}
 
-		if (this.reply && this.reply.user.host != null) {
-			this.text = `@${this.reply.user.username}@${toASCII(this.reply.user.host)} `;
+		if (this.reply) {
+      if (this.reply.user.host != null) {
+        this.text = `@${this.reply.user.username}@${toASCII(this.reply.user.host)} `;
+      } else if (this.reply.user.username != this.$i.username) {
+        this.text = `@${this.reply.user.username}@${toASCII(host)} `;
+      }
 		}
 
 		if (this.reply && this.reply.text != null) {
