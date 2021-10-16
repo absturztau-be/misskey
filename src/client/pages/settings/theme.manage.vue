@@ -10,13 +10,13 @@
 		</optgroup>
 	</FormSelect>
 	<template v-if="selectedTheme">
-		<FormInput readonly :value="selectedTheme.author">
+		<FormInput readonly v-model="selectedTheme.author">
 			<span>{{ $ts.author }}</span>
 		</FormInput>
-		<FormTextarea readonly :value="selectedTheme.desc" v-if="selectedTheme.desc">
+		<FormTextarea readonly v-model="selectedTheme.desc" v-if="selectedTheme.desc">
 			<span>{{ $ts._theme.description }}</span>
 		</FormTextarea>
-		<FormTextarea readonly tall :value="selectedThemeCode">
+		<FormTextarea readonly tall v-model="selectedThemeCode">
 			<span>{{ $ts._theme.code }}</span>
 			<template #desc><button @click="copyThemeCode()" class="_textButton">{{ $ts.copy }}</button></template>
 		</FormTextarea>
