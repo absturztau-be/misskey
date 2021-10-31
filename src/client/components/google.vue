@@ -10,7 +10,12 @@ import { defineComponent } from 'vue';
 import * as os from '@client/os';
 
 export default defineComponent({
-	props: ['q'],
+	props: {
+		q: {
+			type: String,
+			required: true,
+		}
+	},
 	data() {
 		return {
 			query: null,
