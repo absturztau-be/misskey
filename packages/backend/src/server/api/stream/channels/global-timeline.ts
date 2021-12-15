@@ -32,13 +32,13 @@ export default class extends Channel {
 		// リプライなら再pack
 		if (note.replyId != null) {
 			note.reply = await Notes.pack(note.replyId, this.user, {
-				detail: true
+				detail: true,
 			});
 		}
 		// Renoteなら再pack
 		if (note.renoteId != null) {
 			note.renote = await Notes.pack(note.renoteId, this.user, {
-				detail: true
+				detail: true,
 			});
 		}
 
@@ -50,7 +50,7 @@ export default class extends Channel {
 		}
 
 		// Ignore notes from instances the user has muted
-		if (isInstanceMuted(note, this.userProfile?.mutedInstances ?? [])) return;
+		if (isInstanceMuted(note, new Set<string>(this.userProfile?.mutedInstances ?? []))) return;
 
 		// 流れてきたNoteがミュートしているユーザーが関わるものだったら無視する
 		if (isMutedUserRelated(note, this.muting)) return;

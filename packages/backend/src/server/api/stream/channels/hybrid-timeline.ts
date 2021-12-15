@@ -37,7 +37,7 @@ export default class extends Channel {
 
 		if (['followers', 'specified'].includes(note.visibility)) {
 			note = await Notes.pack(note.id, this.user!, {
-				detail: true
+				detail: true,
 			});
 
 			if (note.isHidden) {
@@ -47,19 +47,19 @@ export default class extends Channel {
 			// リプライなら再pack
 			if (note.replyId != null) {
 				note.reply = await Notes.pack(note.replyId, this.user!, {
-					detail: true
+					detail: true,
 				});
 			}
 			// Renoteなら再pack
 			if (note.renoteId != null) {
 				note.renote = await Notes.pack(note.renoteId, this.user!, {
-					detail: true
+					detail: true,
 				});
 			}
 		}
 
 		// Ignore notes from instances the user has muted
-		if (isInstanceMuted(note, this.userProfile?.mutedInstances ?? [])) return;
+		if (isInstanceMuted(note, new Set<string>(this.userProfile?.mutedInstances ?? []))) return;
 
 		// 関係ない返信は除外
 		if (note.reply) {
