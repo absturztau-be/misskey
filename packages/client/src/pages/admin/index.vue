@@ -3,7 +3,7 @@
 	<div v-if="!narrow || page == null" class="nav">
 		<MkHeader :info="header"></MkHeader>
 	
-		<MkSpacer :content-max="700">
+		<MkSpacer :content-max="700" :margin-min="16">
 			<div class="lxpfedzu">
 				<div class="banner">
 					<img :src="$instance.iconUrl || '/favicon.ico'" alt="" class="icon"/>
@@ -29,9 +29,6 @@
 import { computed, defineAsyncComponent, defineComponent, isRef, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { i18n } from '@/i18n';
 import MkSuperMenu from '@/components/ui/super-menu.vue';
-import FormGroup from '@/components/debobigego/group.vue';
-import FormBase from '@/components/debobigego/base.vue';
-import FormButton from '@/components/debobigego/button.vue';
 import MkInfo from '@/components/ui/info.vue';
 import { scroll } from '@/scripts/scroll';
 import { instance } from '@/instance';
@@ -41,10 +38,7 @@ import { lookupUser } from '@/scripts/lookup-user';
 
 export default defineComponent({
 	components: {
-		FormBase,
 		MkSuperMenu,
-		FormGroup,
-		FormButton,
 		MkInfo,
 	},
 
@@ -163,11 +157,6 @@ export default defineComponent({
 				to: '/admin/settings',
 				active: page.value === 'settings',
 			}, {
-				icon: 'fas fa-cloud',
-				text: i18n.locale.files,
-				to: '/admin/files-settings',
-				active: page.value === 'files-settings',
-			}, {
 				icon: 'fas fa-envelope',
 				text: i18n.locale.emailServer,
 				to: '/admin/email-settings',
@@ -236,7 +225,6 @@ export default defineComponent({
 				case 'database': return defineAsyncComponent(() => import('./database.vue'));
 				case 'abuses': return defineAsyncComponent(() => import('./abuses.vue'));
 				case 'settings': return defineAsyncComponent(() => import('./settings.vue'));
-				case 'files-settings': return defineAsyncComponent(() => import('./files-settings.vue'));
 				case 'email-settings': return defineAsyncComponent(() => import('./email-settings.vue'));
 				case 'object-storage': return defineAsyncComponent(() => import('./object-storage.vue'));
 				case 'security': return defineAsyncComponent(() => import('./security.vue'));

@@ -108,6 +108,7 @@ export default defineComponent({
 		return {
 			previewable,
 			gallery,
+			pswpZIndex: os.claimZIndex('middle'),
 		};
 	},
 });
@@ -189,5 +190,13 @@ export default defineComponent({
 			}
 		}
 	}
+}
+</style>
+
+<style lang="scss">
+.pswp {
+	// なぜか機能しない
+  //z-index: v-bind(pswpZIndex);
+	z-index: 2000000;
 }
 </style>

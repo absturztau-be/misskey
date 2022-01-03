@@ -67,7 +67,6 @@
 
 <script lang="ts">
 import { computed, defineComponent, markRaw, version as vueVersion } from 'vue';
-import FormKeyValueView from '@/components/debobigego/key-value-view.vue';
 import MkInstanceStats from '@/components/instance-stats.vue';
 import MkButton from '@/components/ui/button.vue';
 import MkSelect from '@/components/form/select.vue';
@@ -81,12 +80,12 @@ import number from '@/filters/number';
 import MkInstanceInfo from './instance.vue';
 import XMetrics from './metrics.vue';
 import * as os from '@/os';
+import { stream } from '@/stream';
 import * as symbols from '@/symbols';
 
 export default defineComponent({
 	components: {
 		MkNumberDiff,
-		FormKeyValueView,
 		MkInstanceStats,
 		MkContainer,
 		MkFolder,
@@ -113,7 +112,7 @@ export default defineComponent({
 			notesComparedToThePrevDay: null,
 			fetchJobs: () => os.api('admin/queue/deliver-delayed', {}),
 			fetchModLogs: () => os.api('admin/show-moderation-logs', {}),
-			queueStatsConnection: markRaw(os.stream.useChannel('queueStats')),
+			queueStatsConnection: markRaw(stream.useChannel('queueStats')),
 		}
 	},
 
