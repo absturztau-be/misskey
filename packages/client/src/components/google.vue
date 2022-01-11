@@ -5,34 +5,18 @@
 </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import * as os from '@/os';
+<script lang="ts" setup>
+import { ref } from 'vue';
 
-export default defineComponent({
-	props: {
-		q: {
-			type: String,
-			required: true,
-		}
-	},
-	data() {
-		return {
-			query: null,
-		};
-	},
-	mounted() {
-		this.query = this.q;
-	},
-	methods: {
-		search() {
-			const engine = this.$store.state.webSearchEngine ||
-				'https://www.duckduckgo.com/?q={{query}}';
-			const url = engine.replace('{{query}}', this.query)
-			window.open(url, '_blank');
-		}
-	}
-});
+const props = defineProps<{
+	q: string;
+}>();
+
+const query = ref(props.q);
+
+const search = () => {
+	window.open(`https://www.duckduckgo.com/?q=${query.value}`, '_blank');
+};
 </script>
 
 <style lang="scss" scoped>
