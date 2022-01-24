@@ -24,7 +24,7 @@
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
 import insertTextAtCursor from 'insert-text-at-cursor';
-import * as autosize from 'autosize';
+import autosize from 'autosize';
 import { formatTimeString } from '@/scripts/format-time-string';
 import { selectFile } from '@/scripts/select-file';
 import * as os from '@/os';
