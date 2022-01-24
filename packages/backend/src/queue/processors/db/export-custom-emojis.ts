@@ -72,7 +72,7 @@ export async function exportCustomEmojis(job: Bull.Job, done: () => void): Promi
 		let downloaded = false;
 
 		try {
-			await downloadUrl(emoji.url, emojiPath);
+			await downloadUrl(emoji.originalUrl, emojiPath);
 			downloaded = true;
 		} catch (e) { // TODO: 何度か再試行
 			logger.error(e);
@@ -111,7 +111,7 @@ export async function exportCustomEmojis(job: Bull.Job, done: () => void): Promi
 		logger.succ(`Exported to: ${archivePath}`);
 
 		const fileName = 'custom-emojis-' + dateFormat(new Date(), 'yyyy-mm-dd-HH-MM-ss') + '.zip';
-		const driveFile = await addFile(user, archivePath, fileName, null, null, true);
+		const driveFile = await addFile({ user, path: archivePath, name: fileName, force: true });
 
 		logger.succ(`Exported to: ${driveFile.id}`);
 		cleanup();
