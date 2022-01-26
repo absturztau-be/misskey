@@ -109,8 +109,9 @@ export default defineComponent({
 
 		const previewable = (file: misskey.entities.DriveFile): boolean => {
 			if (file.type === 'image/svg+xml') return true; // svgのwebpublic/thumbnailはpngなのでtrue
+      if (file.name.endsWith(".mod") || file.name.endsWith(".xm") || file.name.endsWith(".s3m") || file.name.endsWith(".it")) return true;
 			// FILE_TYPE_BROWSERSAFEに適合しないものはブラウザで表示するのに不適切
-			return (file.type.startsWith('video') || file.type.startsWith('image') || file.name.endsWith(".mod") || file.name.endsWith(".xm") || file.name.endsWith(".s3m") || file.name.endsWith(".it")) && FILE_TYPE_BROWSERSAFE.includes(file.type);
+			return (file.type.startsWith('video') || file.type.startsWith('image')) && FILE_TYPE_BROWSERSAFE.includes(file.type);
 		};
 
 		return {
