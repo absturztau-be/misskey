@@ -155,7 +155,7 @@ export default defineComponent({
 				active: page.value === 'word-mute',
 			}, {
         icon: 'fas fa-comment-slash',
-        text: i18n.locale.instanceMute,
+        text: i18n.ts.instanceMute,
         to: '/settings/instance-mute',
         active: page.value === 'instance-mute'
       }, {
