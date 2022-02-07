@@ -61,7 +61,7 @@ const alpha = (hex, a) => {
 	return `rgba(${r}, ${g}, ${b}, ${a})`;
 };
 
-const colors = ['#008FFB', '#00E396', '#FEB019', '#FF4560'];
+const colors = ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#e300db'];
 const getColor = (i) => {
 	return colors[i % colors.length];
 };
@@ -91,6 +91,11 @@ export default defineComponent({
 			default: false
 		},
 		stacked: {
+			type: Boolean,
+			required: false,
+			default: false
+		},
+		bar: {
 			type: Boolean,
 			required: false,
 			default: false
@@ -187,7 +192,7 @@ export default defineComponent({
 			Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--fg');
 
 			chartInstance = new Chart(chartEl.value, {
-				type: 'line',
+				type: props.bar ? 'bar' : 'line',
 				data: {
 					labels: new Array(props.limit).fill(0).map((_, i) => getDate(i).toLocaleString()).slice().reverse(),
 					datasets: data.series.map((x, i) => ({
@@ -195,12 +200,13 @@ export default defineComponent({
 						label: x.name,
 						data: x.data.slice().reverse(),
 						pointRadius: 0,
-						tension: 0,
 						borderWidth: 2,
 						borderColor: x.color ? x.color : getColor(i),
 						borderDash: x.borderDash || [],
 						borderJoinStyle: 'round',
 						backgroundColor: alpha(x.color ? x.color : getColor(i), 0.1),
+						barPercentage: 0.9,
+						categoryPercentage: 0.9,
 						fill: x.type === 'area',
 						hidden: !!x.hidden,
 					})),
@@ -218,6 +224,7 @@ export default defineComponent({
 					scales: {
 						x: {
 							type: 'time',
+							stacked: props.stacked,
 							time: {
 								stepSize: 1,
 								unit: props.span === 'day' ? 'month' : 'day',
@@ -250,7 +257,15 @@ export default defineComponent({
 					},
 					interaction: {
 						intersect: false,
+						mode: 'index',
 					},
+					elements: {
+						point: {
+							hoverRadius: 5,
+							hoverBorderWidth: 2,
+						},
+					},
+					animation: false,
 					plugins: {
 						legend: {
 							display: props.detailed,
@@ -324,17 +339,48 @@ export default defineComponent({
 			// TODO
 		};
 
-		const fetchFederationInstancesChart = async (total: boolean): Promise<typeof data> => {
+		const fetchFederationChart = async (): Promise<typeof data> => {
 			const raw = await os.api('charts/federation', { limit: props.limit, span: props.span });
 			return {
 				series: [{
-					name: 'Instances',
+					name: 'Instances total',
 					type: 'area',
-					data: format(total
-						? raw.instance.total
-						: sum(raw.instance.inc, negate(raw.instance.dec))
-					),
+					data: format(raw.instance.total),
+				}, {
+					name: 'Instances inc/dec',
+					type: 'area',
+					data: format(sum(raw.instance.inc, negate(raw.instance.dec))),
+				}, {
+					name: 'Delivered instances',
+					type: 'area',
+					data: format(raw.deliveredInstances),
+				}, {
+					name: 'Inbox instances',
+					type: 'area',
+					data: format(raw.inboxInstances),
 				}],
+			};
+		};
+
+		const fetchApRequestChart = async (): Promise<typeof data> => {
+			const raw = await os.api('charts/ap-request', { limit: props.limit, span: props.span });
+			return {
+				series: [{
+					name: 'In',
+					type: 'area',
+					color: '#008FFB',
+					data: format(raw.inboxReceived)
+				}, {
+					name: 'Out (succ)',
+					type: 'area',
+					color: '#00E396',
+					data: format(raw.deliverSucceeded)
+				}, {
+					name: 'Out (fail)',
+					type: 'area',
+					color: '#FEB019',
+					data: format(raw.deliverFailed)
+				}]
 			};
 		};
 
@@ -425,17 +471,37 @@ export default defineComponent({
 			const raw = await os.api('charts/active-users', { limit: props.limit, span: props.span });
 			return {
 				series: [{
-					name: 'Combined',
-					type: 'line',
-					data: format(sum(raw.local.users, raw.remote.users)),
-				}, {
-					name: 'Local',
+					name: 'Users',
 					type: 'area',
-					data: format(raw.local.users),
+					data: format(raw.users),
 				}, {
-					name: 'Remote',
+					name: 'Noted',
 					type: 'area',
-					data: format(raw.remote.users),
+					data: format(raw.notedUsers),
+				}, {
+					name: '< Week',
+					type: 'area',
+					data: format(raw.registeredWithinWeek),
+				}, {
+					name: '< Month',
+					type: 'area',
+					data: format(raw.registeredWithinMonth),
+				}, {
+					name: '< Year',
+					type: 'area',
+					data: format(raw.registeredWithinYear),
+				}, {
+					name: '> Week',
+					type: 'area',
+					data: format(raw.registeredOutsideWeek),
+				}, {
+					name: '> Month',
+					type: 'area',
+					data: format(raw.registeredOutsideMonth),
+				}, {
+					name: '> Year',
+					type: 'area',
+					data: format(raw.registeredOutsideYear),
 				}],
 			};
 		};
@@ -476,26 +542,6 @@ export default defineComponent({
 			};
 		};
 
-		const fetchDriveTotalChart = async (): Promise<typeof data> => {
-			const raw = await os.api('charts/drive', { limit: props.limit, span: props.span });
-			return {
-				bytes: true,
-				series: [{
-					name: 'Combined',
-					type: 'line',
-					data: format(sum(raw.local.totalSize, raw.remote.totalSize)),
-				}, {
-					name: 'Local',
-					type: 'area',
-					data: format(raw.local.totalSize),
-				}, {
-					name: 'Remote',
-					type: 'area',
-					data: format(raw.remote.totalSize),
-				}],
-			};
-		};
-
 		const fetchDriveFilesChart = async (): Promise<typeof data> => {
 			const raw = await os.api('charts/drive', { limit: props.limit, span: props.span });
 			return {
@@ -527,25 +573,6 @@ export default defineComponent({
 					name: 'Remote -',
 					type: 'area',
 					data: format(negate(raw.remote.decCount)),
-				}],
-			};
-		};
-
-		const fetchDriveFilesTotalChart = async (): Promise<typeof data> => {
-			const raw = await os.api('charts/drive', { limit: props.limit, span: props.span });
-			return {
-				series: [{
-					name: 'Combined',
-					type: 'line',
-					data: format(sum(raw.local.totalCount, raw.remote.totalCount)),
-				}, {
-					name: 'Local',
-					type: 'area',
-					data: format(raw.local.totalCount),
-				}, {
-					name: 'Remote',
-					type: 'area',
-					data: format(raw.remote.totalCount),
 				}],
 			};
 		};
@@ -680,11 +707,26 @@ export default defineComponent({
 			};
 		};
 
+		const fetchPerUserDriveChart = async (): Promise<typeof data> => {
+			const raw = await os.api('charts/user/drive', { userId: props.args.user.id, limit: props.limit, span: props.span });
+			return {
+				series: [{
+					name: 'Inc',
+					type: 'area',
+					data: format(raw.incSize),
+				}, {
+					name: 'Dec',
+					type: 'area',
+					data: format(raw.decSize),
+				}],
+			};
+		};
+
 		const fetchAndRender = async () => {
 			const fetchData = () => {
 				switch (props.src) {
-					case 'federation-instances': return fetchFederationInstancesChart(false);
-					case 'federation-instances-total': return fetchFederationInstancesChart(true);
+					case 'federation': return fetchFederationChart();
+					case 'ap-request': return fetchApRequestChart();
 					case 'users': return fetchUsersChart(false);
 					case 'users-total': return fetchUsersChart(true);
 					case 'active-users': return fetchActiveUsersChart();
@@ -693,9 +735,7 @@ export default defineComponent({
 					case 'remote-notes': return fetchNotesChart('remote');
 					case 'notes-total': return fetchNotesTotalChart();
 					case 'drive': return fetchDriveChart();
-					case 'drive-total': return fetchDriveTotalChart();
 					case 'drive-files': return fetchDriveFilesChart();
-					case 'drive-files-total': return fetchDriveFilesTotalChart();
 					
 					case 'instance-requests': return fetchInstanceRequestsChart();
 					case 'instance-users': return fetchInstanceUsersChart(false);
@@ -710,6 +750,7 @@ export default defineComponent({
 					case 'instance-drive-files-total': return fetchInstanceDriveFilesChart(true);
 
 					case 'per-user-notes': return fetchPerUserNotesChart();
+					case 'per-user-drive': return fetchPerUserDriveChart();
 				}
 			};
 			fetching.value = true;

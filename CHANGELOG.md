@@ -2,10 +2,18 @@
 ## 12.x.x (unreleased)
 
 ### Improvements
+- 
 
 ### Bugfixes
+- 
 
+You should also include the user name that made the change.
 -->
+
+## 12.103.1 (2022/02/02)
+
+### Bugfixes
+- クライアント: ツールチップの表示位置が正しくない問題を修正
 
 ## 12.103.0 (2022/02/02)
 
