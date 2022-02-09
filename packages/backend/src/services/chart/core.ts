@@ -46,6 +46,8 @@ const removeDuplicates = (array: any[]) => Array.from(new Set(array));
 type Schema = Record<string, {
 	uniqueIncrement?: boolean;
 
+	intersection?: string[] | ReadonlyArray<string>;
+
 	range?: 'big' | 'small' | 'medium';
 
 	// previousな値を引き継ぐかどうか
@@ -384,6 +386,33 @@ export default abstract class Chart<T extends Schema> {
 				}
 			}
 
+			// compute intersection
+			// TODO: intersectionに指定されたカラムがintersectionだった場合の対応
+			for (const [k, v] of Object.entries(this.schema)) {
+				const intersection = v.intersection;
+				if (intersection) {
+					const name = columnPrefix + k.replaceAll('.', columnDot);
+					const firstKey = intersection[0];
+					const firstTempColumnName = uniqueTempColumnPrefix + firstKey.replaceAll('.', columnDot);
+					const currentValuesForHour = new Set([...(finalDiffs[firstKey] ?? []), ...logHour[firstTempColumnName]]);
+					const currentValuesForDay = new Set([...(finalDiffs[firstKey] ?? []), ...logDay[firstTempColumnName]]);
+					for (let i = 1; i < intersection.length; i++) {
+						const targetKey = intersection[i];
+						const targetTempColumnName = uniqueTempColumnPrefix + targetKey.replaceAll('.', columnDot);
+						const targetValuesForHour = new Set([...(finalDiffs[targetKey] ?? []), ...logHour[targetTempColumnName]]);
+						const targetValuesForDay = new Set([...(finalDiffs[targetKey] ?? []), ...logDay[targetTempColumnName]]);
+						currentValuesForHour.forEach(v => {
+							if (!targetValuesForHour.has(v)) currentValuesForHour.delete(v);
+						});
+						currentValuesForDay.forEach(v => {
+							if (!targetValuesForDay.has(v)) currentValuesForDay.delete(v);
+						});
+					}
+					queryForHour[name] = currentValuesForHour.size;
+					queryForDay[name] = currentValuesForDay.size;
+				}
+			}
+
 			// ログ更新
 			await Promise.all([
 				this.repositoryForHour.createQueryBuilder()
@@ -425,6 +454,10 @@ export default abstract class Chart<T extends Schema> {
 			columns[columnPrefix + name] = v;
 		}
 
+		if (Object.keys(columns).length === 0) {
+			return;
+		}
+
 		const update = async (logHour: RawRecord<T>, logDay: RawRecord<T>): Promise<void> => {
 			await Promise.all([
 				this.repositoryForHour.createQueryBuilder()
@@ -461,6 +494,10 @@ export default abstract class Chart<T extends Schema> {
 				const name = k.replaceAll('.', columnDot);
 				columns[uniqueTempColumnPrefix + name] = [];
 			}
+		}
+
+		if (Object.keys(columns).length === 0) {
+			return;
 		}
 
 		await Promise.all([
