@@ -6,13 +6,7 @@
 		<span>{{ $ts.clickToShow }}</span>
 	</div>
 	<div v-else-if="media.type.startsWith('audio') && media.type !== 'audio/midi'" class="audio">
-		<audio ref="audioEl"
-			class="audio"
-			:src="media.url"
-			:title="media.name"
-			controls
-			preload="metadata"
-			@volumechange="volumechange" />
+    <XWaveSurfer :src="media.url"></XWaveSurfer>
 	</div>
 	<a v-else class="download"
 		:href="media.url"
@@ -28,6 +22,7 @@
 <script lang="ts" setup>
 import { onMounted } from 'vue';
 import * as misskey from 'misskey-js';
+import XWaveSurfer from './wavesurver.vue';
 import { ColdDeviceStorage } from '@/store';
 
 const props = withDefaults(defineProps<{

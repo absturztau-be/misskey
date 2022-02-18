@@ -6144,6 +6144,11 @@ watchpack@^2.3.1:
     glob-to-regexp "^0.4.1"
     graceful-fs "^4.1.2"
 
+wavesurfer.js@6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/wavesurfer.js/-/wavesurfer.js-6.0.1.tgz#a511611b2f4d04d098da8166f1fd2a818db20a82"
+  integrity sha512-igFjn9Zuo/vqcKdNKP90GZnKMGgder3Xz1cCR1UBw6ifdXTrfQDHpIte7GuddupQIEGoLajhvIgv1OJRXeU0XQ==
+
 web-push@3.4.5:
   version "3.4.5"
   resolved "https://registry.yarnpkg.com/web-push/-/web-push-3.4.5.tgz#f94074ff150538872c7183e4d8881c8305920cf1"
