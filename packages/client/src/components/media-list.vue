@@ -6,6 +6,7 @@
 			<template v-for="media in mediaList.filter(media => previewable(media))">
 				<XVideo v-if="media.type.startsWith('video')" :key="media.id" :video="media"/>
         <XModPlayer :module="media" :key="media.id" v-else-if="media.name.endsWith('.mod') || media.name.endsWith('.xm') || media.name.endsWith('.s3m') || media.name.endsWith('.it')"/>
+        <XAnsi :ansi-file="media" :key="media.id" v-else-if="media.name.endsWith('.ans')"/>
 				<XImage v-else-if="media.type.startsWith('image')" :key="media.id" class="image" :data-id="media.id" :image="media" :raw="raw"/>
 			</template>
 		</div>
@@ -23,6 +24,7 @@ import XBanner from './media-banner.vue';
 import XImage from './media-image.vue';
 import XVideo from './media-video.vue';
 import XModPlayer from './mod-player.vue';
+import XAnsi from './media-ansi.vue';
 import * as os from '@/os';
 import { FILE_TYPE_BROWSERSAFE } from '@/const';
 import { defaultStore } from '@/store';
@@ -100,6 +102,7 @@ onMounted(() => {
 const previewable = (file: misskey.entities.DriveFile): boolean => {
 	if (file.type === 'image/svg+xml') return true; // svgのwebpublic/thumbnailはpngなのでtrue
   if (file.name.endsWith(".mod") || file.name.endsWith(".xm") || file.name.endsWith(".s3m") || file.name.endsWith(".it")) return true;
+  if (file.name.endsWith(".ans")) return true;
 	// FILE_TYPE_BROWSERSAFEに適合しないものはブラウザで表示するのに不適切
 	return (file.type.startsWith('video') || file.type.startsWith('image')) && FILE_TYPE_BROWSERSAFE.includes(file.type);
 };
