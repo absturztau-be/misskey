@@ -2,7 +2,6 @@
 ## 12.x.x (unreleased)
 
 ### Improvements
-- 
 
 ### Bugfixes
 - 
@@ -15,16 +14,23 @@ You should also include the user name that made the change.
 - From this version, Node 18.0.0 or later is required.
 
 ### Improvements
-- 
+- enhance: ドライブに画像ファイルをアップロードするときオリジナル画像を破棄してwebpublicのみ保持するオプション @tamaina
+- enhance: API: notifications/readは配列でも受け付けるように #7667 @tamaina
+- enhance: プッシュ通知を複数アカウント対応に #7667 @tamaina
+- enhance: プッシュ通知にクリックやactionを設定 #7667 @tamaina
 
 ### Bugfixes
-- 
+- Client: fix settings page @tamaina
+- Client: fix profile tabs @futchitwo
+- Server: await promises when following or unfollowing users @Johann150
+- Client: fix abuse reports page to be able to show all reports @Johann150
+- Federation: Add rel attribute to host-meta @mei23
 
 ## 12.110.1 (2022/04/23)
 
 ### Bugfixes
 - Fix GOP rendering @syuilo
-- Improve performance of antenna, clip, and list @xianon
+- Improve performance of antenna, clip, and list @xianonn
 
 ## 12.110.0 (2022/04/11)
 
