@@ -32,15 +32,15 @@ ChiptuneJsPlayer.prototype.fireEvent = function (eventName: string, response) {
 	}
 };
 
-ChiptuneJsPlayer.prototype.addHandler = function (eventName: string, handler: function) {
+ChiptuneJsPlayer.prototype.addHandler = function (eventName: string, handler: Function) {
 	this.handlers.push({ eventName, handler });
 };
 
-ChiptuneJsPlayer.prototype.onEnded = function (handler: function) {
+ChiptuneJsPlayer.prototype.onEnded = function (handler: Function) {
 	this.addHandler('onEnded', handler);
 };
 
-ChiptuneJsPlayer.prototype.onError = function (handler: function) {
+ChiptuneJsPlayer.prototype.onError = function (handler: Function) {
 	this.addHandler('onError', handler);
 };
 
@@ -90,7 +90,7 @@ ChiptuneJsPlayer.prototype.load = function (input) {
 		const player = this;
 		if (input instanceof File) {
 			const reader = new FileReader();
-			reader.onload = () {
+			reader.onload = () => {
 				resolve(reader.result);
 			};
 			reader.readAsArrayBuffer(input);

@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { escapes } from '@/scripts/escapes'
+import '@/scripts/escapes'
 
 export default defineComponent({
   props: {

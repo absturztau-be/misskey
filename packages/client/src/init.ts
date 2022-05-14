@@ -221,10 +221,15 @@ const rootEl = (() => {
 	return rootEl;
 })();
 
-const chiplib = document.createElement('script');
-chiplib.type = 'text/javascript';
-chiplib.src = '/static-assets/libopenmpt.js';
-document.body.appendChild(chiplib);
+if (!document.querySelector("script[src='/static-assets/libopenmpt.js']")) {
+  const chiplib = document.createElement('script');
+  chiplib.type = 'text/javascript';
+  chiplib.src = '/static-assets/libopenmpt.js';
+  chiplib.onload = () => {
+    window.libopenmpt = Module;
+  };
+  document.body.appendChild(chiplib);
+}
 
 app.mount(rootEl);
 
