@@ -14,8 +14,14 @@
 	</div>
 
 	<div v-else ref="rootEl">
+		<div v-show="pagination.reversed && more" key="_more_" class="cxiknjgy _gap">
+			<MkButton v-if="!moreFetching" class="button" :disabled="moreFetching" :style="{ cursor: moreFetching ? 'wait' : 'pointer' }" primary @click="fetchMoreAhead">
+				{{ $ts.loadMore }}
+			</MkButton>
+			<MkLoading v-else class="loading"/>
+		</div>
 		<slot :items="items"></slot>
-		<div v-show="more" key="_more_" class="cxiknjgy _gap">
+		<div v-show="!pagination.reversed && more" key="_more_" class="cxiknjgy _gap">
 			<MkButton v-if="!moreFetching" v-appear="($store.state.enableInfiniteScroll && !disableAutoLoad) ? fetchMore : null" class="button" :disabled="moreFetching" :style="{ cursor: moreFetching ? 'wait' : 'pointer' }" primary @click="fetchMore">
 				{{ $ts.loadMore }}
 			</MkButton>
@@ -244,6 +250,11 @@ const append = (item: Item): void => {
 	items.value.push(item);
 };
 
+const removeItem = (finder: (item: Item) => boolean) => {
+	const i = items.value.findIndex(finder);
+	items.value.splice(i, 1);
+};
+
 const updateItem = (id: Item['id'], replacer: (old: Item) => Item): void => {
 	const i = items.value.findIndex(item => item.id === id);
 	items.value[i] = replacer(items.value[i]);
@@ -273,9 +284,9 @@ defineExpose({
 	queue,
 	backed,
 	reload,
-	fetchMoreAhead,
 	prepend,
 	append,
+	removeItem,
 	updateItem,
 });
 </script>
