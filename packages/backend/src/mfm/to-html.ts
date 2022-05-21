@@ -141,7 +141,7 @@ export function toHtml(nodes: mfm.MfmNode[] | null, mentionedRemoteUsers: IMenti
 
 		search(node) {
 			const a = doc.createElement('a');
-			a.href = `https://www.duckduckgo.com/?q=${node.props.query}`;
+			a.href = `https://searx.absturztau.be/?q=${node.props.query}`;
 			a.textContent = node.props.content;
 			return a;
 		},
