@@ -121,10 +121,10 @@ function submit() {
 	}).then(() => {
 		os.success();
 		$i!.twoFactorEnabled = true;
-	}).catch(e => {
+	}).catch(err => {
 		os.alert({
 			type: 'error',
-			text: e
+			text: err,
 		});
 	});
 }
@@ -142,7 +142,7 @@ function registerKey() {
 		registration.value = null;
 		key.lastUsed = new Date();
 		os.success();
-	})
+	});
 }
 
 function unregisterKey(key) {
